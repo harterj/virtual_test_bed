@@ -5,13 +5,13 @@
 ## Thermal Only Physics                                                       ##
 ################################################################################
 
-R_clad_o = 0.0105 # heat pipe outer radius
-R_hp_hole = 0.0107 # heat pipe + gap
-num_sides = 12 # number of sides of heat pipe as a result of mesh polygonization
-alpha = '${fparse 2 * pi / num_sides}'
-perimeter_correction = '${fparse 0.5 * alpha / sin(0.5 * alpha)}' # polygonization correction factor for perimeter
-area_correction = '${fparse sqrt(alpha / sin(alpha))}' # polygonization correction factor for area
-corr_factor = '${fparse R_hp_hole / R_clad_o * area_correction / perimeter_correction}'
+# R_clad_o = 0.0105 # heat pipe outer radius
+# R_hp_hole = 0.0107 # heat pipe + gap
+# num_sides = 12 # number of sides of heat pipe as a result of mesh polygonization
+# alpha = '${fparse 2 * pi / num_sides}'
+# perimeter_correction = '${fparse 0.5 * alpha / sin(0.5 * alpha)}' # polygonization correction factor for perimeter
+# area_correction = '${fparse sqrt(alpha / sin(alpha))}' # polygonization correction factor for area
+# corr_factor = '${fparse R_hp_hole / R_clad_o * area_correction / perimeter_correction}'
 
 [GlobalParams]
   flux_conversion_factor = 1
@@ -127,17 +127,17 @@ corr_factor = '${fparse R_hp_hole / R_clad_o * area_correction / perimeter_corre
     property = specific_heat
     execute_on = timestep_end
   []
-  [flux_uo]
-    type = SpatialUserObjectAux
-    variable = flux_uo
-    user_object = flux_uo
-  []
-  [flux_uo_corr]
-    type = NormalizationAux
-    variable = flux_uo_corr
-    source_variable = flux_uo
-    normal_factor = '${fparse corr_factor}'
-  []
+  # [flux_uo]
+  #   type = SpatialUserObjectAux
+  #   variable = flux_uo
+  #   user_object = flux_uo
+  # []
+  # [flux_uo_corr]
+  #   type = NormalizationAux
+  #   variable = flux_uo_corr
+  #   source_variable = flux_uo
+  #   normal_factor = '${fparse corr_factor}'
+  # []
 []
 
 [BCs]
@@ -248,48 +248,48 @@ corr_factor = '${fparse R_hp_hole / R_clad_o * area_correction / perimeter_corre
   []
 []
 
-[MultiApps]
-  [sockeye]
-    type = TransientMultiApp
-    app_type = SockeyeApp
-    positions_file = 'hp_centers.txt'
-    input_files = 'HPMR_sockeye_ss.i'
-    execute_on = 'timestep_begin' # execute on timestep begin because hard to have a good initial guess on heat flux
-    max_procs_per_app = 1
-    output_in_position = true
-    sub_cycling = true
-  []
-[]
+# [MultiApps]
+#   [sockeye]
+#     type = TransientMultiApp
+#     app_type = SockeyeApp
+#     positions_file = 'hp_centers.txt'
+#     input_files = 'HPMR_sockeye_ss.i'
+#     execute_on = 'timestep_begin' # execute on timestep begin because hard to have a good initial guess on heat flux
+#     max_procs_per_app = 1
+#     output_in_position = true
+#     sub_cycling = true
+#   []
+# []
 
-[Transfers]
-  [from_sockeye_temp]
-    type = MultiAppGeneralFieldNearestLocationTransfer
-    from_multi_app = sockeye
-    source_variable = hp_temp_aux
-    variable = hp_temp_aux
-    execute_on = 'timestep_begin'
-  []
-  [to_sockeye_flux]
-    type = MultiAppGeneralFieldUserObjectTransfer
-    variable = master_flux
-    to_multi_app = sockeye
-    execute_on = 'timestep_begin'
-    source_user_object = flux_uo
-  []
-[]
+# [Transfers]
+#   [from_sockeye_temp]
+#     type = MultiAppGeneralFieldNearestLocationTransfer
+#     from_multi_app = sockeye
+#     source_variable = hp_temp_aux
+#     variable = hp_temp_aux
+#     execute_on = 'timestep_begin'
+#   []
+#   [to_sockeye_flux]
+#     type = MultiAppGeneralFieldUserObjectTransfer
+#     variable = master_flux
+#     to_multi_app = sockeye
+#     execute_on = 'timestep_begin'
+#     source_user_object = flux_uo
+#   []
+# []
 
-[UserObjects]
-  [flux_uo]
-    type = NearestPointLayeredSideDiffusiveFluxAverage
-    direction = z
-    num_layers = 100
-    points_file = 'hp_centers.txt'
-    variable = temp
-    diffusivity = thermal_conductivity
-    execute_on = linear
-    boundary = 'heat_pipe_ht_surf'
-  []
-[]
+# [UserObjects]
+#   [flux_uo]
+#     type = NearestPointLayeredSideDiffusiveFluxAverage
+#     direction = z
+#     num_layers = 100
+#     points_file = 'hp_centers.txt'
+#     variable = temp
+#     diffusivity = thermal_conductivity
+#     execute_on = linear
+#     boundary = 'heat_pipe_ht_surf'
+#   []
+# []
 
 [Executioner]
   type = Transient
@@ -441,5 +441,9 @@ corr_factor = '${fparse R_hp_hole / R_clad_o * area_correction / perimeter_corre
   exodus = true
   color = true
   csv = true
-  checkpoint = true
+  # checkpoint = true
+  [check]
+    type = Checkpoint
+    execute_on = FINAL
+  []
 []
