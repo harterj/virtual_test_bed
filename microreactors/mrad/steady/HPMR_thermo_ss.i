@@ -303,7 +303,7 @@ corr_factor = '${fparse R_hp_hole / R_clad_o * area_correction / perimeter_corre
   start_time = -5e4 # negative start time so we can start running from t = 0
   end_time = 0
   dtmin = 1
-  dt = 1000
+  dt = 10000
   # num_steps = 1
 []
 
